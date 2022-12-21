@@ -12,13 +12,13 @@ fastlane add_plugin revenuecat
 
 ## About RevenueCat
 
-⚠️ This requires access to RevenueCat's V2 Developer API
+⚠️ Some of these actions requires access to RevenueCat's V2 Developer API
 
-| Actions | Description |
-| --- | --- |
-| revenuecat_import_app_store_products | Imports products on App Store Connect that are not in RevenueCat yet |
-| revenuecat_import_play_store_products | Imports products on Google Play Consoles that are not in RevenueCat yet |
-| price_mapping_app_store | Creates a [price mapping CSV](https://github.com/RevenueCat-Samples/import-csv-samples/blob/main/iOS/ios_product_price_map_sample.csv) need for [bulk imports](https://www.revenuecat.com/docs/receipt-imports#bulk-imports) for migrations |
+| Action | Uses V2 Developer AI | Description |
+| --- | --- | --- |
+| revenuecat_import_app_store_products | Yes | Imports products on App Store Connect that are not in RevenueCat yet |
+| revenuecat_import_play_store_products | Yes | Imports products on Google Play Consoles that are not in RevenueCat yet |
+| price_mapping_app_store | No | Creates a [price mapping CSV](https://github.com/RevenueCat-Samples/import-csv-samples/blob/main/iOS/ios_product_price_map_sample.csv) need for [bulk imports](https://www.revenuecat.com/docs/receipt-imports#bulk-imports) for migrations |
 
 ### Action `import_app_store`
 
