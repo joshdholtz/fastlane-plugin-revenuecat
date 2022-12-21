@@ -29,7 +29,7 @@ lane :import_app_store do
   revenuecat_import_app_store_products(
     apple_username: "you@example.com",
     apple_team_name: "Your Team",
-    apple_app_identifier: "com.example.app"
+    apple_app_identifier: "com.example.app",
 
     revenuecat_api_key: "sk_xxxxxxxxxxxx",
     revenuecat_project_id: "projXXXXXX",
