@@ -10,6 +10,53 @@ module Fastlane
 
   module Helper
     class RevenuecatHelper
+      def self.available_options_google_play
+        [
+          FastlaneCore::ConfigItem.new(key: :json_key,
+                                     env_name: "RC_GOOGLE_JSON_KEY",
+                                     short_option: "-j",
+                                     conflicting_options: [:issuer, :key, :json_key_data],
+                                     optional: true, # this shouldn't be optional but is until --key and --issuer are completely removed
+                                     description: "The path to a file containing service account JSON, used to authenticate with Google",
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
+                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
+                                     end),
+          FastlaneCore::ConfigItem.new(key: :json_key_data,
+                                      env_name: "RC_GOOGLE_JSON_KEY_DATA",
+                                      short_option: "-c",
+                                      conflicting_options: [:issuer, :key, :json_key],
+                                      optional: true,
+                                      description: "The raw service account JSON data used to authenticate with Google",
+                                      code_gen_sensitive: true,
+                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
+                                      default_value_dynamic: true,
+                                      verify_block: proc do |value|
+                                        begin
+                                          JSON.parse(value)
+                                        rescue JSON::ParserError
+                                          UI.user_error!("Could not parse service account json  JSON::ParseError")
+                                        end
+                                      end),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                      env_name: "RC_GOOGLE_TIMEOUT",
+                                      optional: true,
+                                      description: "Timeout for read, open, and send (in seconds)",
+                                      type: Integer,
+                                      default_value: 300),
+          FastlaneCore::ConfigItem.new(key: :root_url,
+                                     env_name: "RC_GOOGLE_ROOT_URL",
+                                     description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not parse URL '#{value}'") unless value =~ URI.regexp
+                                     end),
+        ]
+      end
+
       def self.available_options_app_store_connect
         [
           FastlaneCore::ConfigItem.new(key: :apple_username,
@@ -128,6 +175,57 @@ module Fastlane
             identifier: identifier
           )
         end
+      end
+
+      def self.get_google_subscriptions(access_token:, package_name:)
+        url = URI("https://androidpublisher.googleapis.com/androidpublisher/v3/applications/#{package_name}/subscriptions")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Get.new(url)
+        request["Accept"] = 'application/json'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{access_token}"
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        identifiers = json["subscriptions"].map do |subscription|
+          product_id = subscription["productId"]
+
+          base_plans = subscription["basePlans"]
+          base_plans.map do |base_plan|
+            base_plan_id = base_plan["basePlanId"]
+
+            "#{product_id}:#{base_plan_id}"
+          end
+        end.flatten(1)
+
+        UI.verbose("Found Google Play subscription identifiers: #{identifiers.join(', ')}")
+        return identifiers
+      end
+
+      def self.get_google_in_app_products(access_token:, package_name:)
+        url = URI("https://androidpublisher.googleapis.com/androidpublisher/v3/applications/#{package_name}/inappproducts")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Get.new(url)
+        request["Accept"] = 'application/json'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{access_token}"
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        identifiers = json["inappproduct"].map do |product|
+          product["sku"]
+        end
+
+        UI.verbose("Found Google Play in-app product identifiers: #{identifiers.join(', ')}")
+        return identifiers
       end
 
     end

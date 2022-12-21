@@ -12,3 +12,6 @@ coverage
 test-results
 
 .env
+service-credentials.json
+
+.DS_Store

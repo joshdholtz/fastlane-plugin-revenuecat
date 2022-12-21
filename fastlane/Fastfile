@@ -10,6 +10,16 @@ lane :import_app_store do
   )
 end
 
+lane :import_play_store do
+  revenuecat_import_play_store_products(
+    # json_key: "./fastlane/service-credentials.json",
+
+    # revenuecat_api_key: "sk_xxxxxxxxxxxx",
+    # revenuecat_project_id: "projXXXXXX",
+    # revenuecat_app_id: "appXXXXX"
+  )
+end
+
 lane :price_mapping_app_store do
   revenuecat_create_app_store_price_mapping(
     # apple_username: "you@example.com",
