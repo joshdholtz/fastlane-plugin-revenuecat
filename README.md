@@ -18,7 +18,7 @@ fastlane add_plugin revenuecat
 | --- | --- | --- |
 | revenuecat_import_app_store_products | Yes | Imports products on App Store Connect that are not in RevenueCat yet |
 | revenuecat_import_play_store_products | Yes | Imports products on Google Play Consoles that are not in RevenueCat yet |
-| price_mapping_app_store | No | Creates a [price mapping CSV](https://github.com/RevenueCat-Samples/import-csv-samples/blob/main/iOS/ios_product_price_map_sample.csv) need for [bulk imports](https://www.revenuecat.com/docs/receipt-imports#bulk-imports) for migrations |
+| revenuecat_create_app_store_price_mapping | No | Creates a [price mapping CSV](https://github.com/RevenueCat-Samples/import-csv-samples/blob/main/iOS/ios_product_price_map_sample.csv) need for [bulk imports](https://www.revenuecat.com/docs/receipt-imports#bulk-imports) for migrations |
 
 ### Action `import_app_store`
 
@@ -83,7 +83,7 @@ y
 [22:58:02]: Added single_tip_small
 ```
 
-### Action `price_mapping_app_store`
+### Action `revenuecat_create_app_store_price_mapping`
 
 Creates a [price mapping CSV](https://github.com/RevenueCat-Samples/import-csv-samples/blob/main/iOS/ios_product_price_map_sample.csv) need for [bulk imports](https://www.revenuecat.com/docs/receipt-imports#bulk-imports) for migrations
 
