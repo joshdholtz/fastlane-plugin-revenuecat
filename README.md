@@ -10,6 +10,11 @@ This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To 
 fastlane add_plugin revenuecat
 ```
 
+If Fastlane cannot find the plugin, try specifying the branch in your `Pluginfile`:
+```plaintext
+gem 'fastlane-plugin-revenuecat', git: 'https://github.com/RevenueCat/fastlane-plugin-revenuecat', branch: 'main'
+```
+
 ## About RevenueCat
 
 ⚠️ Some of these actions requires access to RevenueCat's V2 Developer API
