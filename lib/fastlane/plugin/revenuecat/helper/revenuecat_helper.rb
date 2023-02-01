@@ -154,7 +154,163 @@ module Fastlane
         response = http.request(request)
         json = JSON.parse(response.read_body)
 
-        UI.success("Added #{identifier}")
+        UI.success("Added product #{identifier}")
+
+        json
+      end
+
+      def self.get_revenuecat_entitlements(api_key:, project_id:, app_id:)
+        url = URI("https://api.revenuecat.com/v2/projects/#{project_id}/entitlements")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Get.new(url)
+        request["Accept"] = 'application/json'
+        request["X-Platform"] = 'ios'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{api_key}"
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        entitlements = json["items"]
+
+        return entitlements
+      end
+
+      def self.create_revenuecat_entitlement(api_key:, project_id:, app_id: , lookup_key:, display_name:)
+        body = {
+          "lookup_key": lookup_key,
+          "display_name": display_name
+        }
+
+        url = URI("https://api.revenuecat.com/v2/projects/#{project_id}/entitlements")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Post.new(url)
+        request["Accept"] = 'application/json'
+        request["X-Platform"] = 'ios'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{api_key}"
+
+        request.body = body.to_json
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        UI.success("Added entitlement #{lookup_key}")
+
+        json
+      end
+
+      def self.attach_products_to_entitlement(api_key:, project_id:, app_id: , product_ids:, entitlement_id:)
+        body = {
+          "product_ids": product_ids
+        }
+
+        url = URI("https://api.revenuecat.com/v2/projects/#{project_id}/entitlements/#{entitlement_id}/actions/attach_products")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Post.new(url)
+        request["Accept"] = 'application/json'
+        request["X-Platform"] = 'ios'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{api_key}"
+
+        request.body = body.to_json
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        UI.success("Attached products #{product_ids} to #{entitlement_id}")
+
+        json
+      end
+
+      def self.create_revenuecat_offering(api_key:, project_id:, app_id:, lookup_key:, display_name:)
+        body = {
+          "lookup_key": lookup_key,
+          "display_name": display_name
+        }
+
+        url = URI("https://api.revenuecat.com/v2/projects/#{project_id}/offerings")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Post.new(url)
+        request["Accept"] = 'application/json'
+        request["X-Platform"] = 'ios'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{api_key}"
+
+        request.body = body.to_json
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        UI.success("Added offering #{lookup_key}")
+
+        json
+      end 
+
+      def self.create_revenuecat_package(api_key:, project_id:, app_id:, offering_id:, lookup_key:, display_name:, position:)
+        body = {
+          "lookup_key": lookup_key,
+          "display_name": display_name,
+          "position": position
+        }
+
+        url = URI("https://api.revenuecat.com/v2/projects/#{project_id}/offerings/#{offering_id}/packages")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Post.new(url)
+        request["Accept"] = 'application/json'
+        request["X-Platform"] = 'ios'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{api_key}"
+
+        request.body = body.to_json
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        UI.success("Added package #{lookup_key}")
+
+        json
+      end
+
+      def self.attach_products_to_package(api_key:, project_id:, app_id: , product_ids:, package_id:)
+        body = {
+          "product_ids": product_ids
+        }
+
+        url = URI("https://api.revenuecat.com/v2/projects/#{project_id}/packages/#{package_id}/actions/attach_products")
+
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Post.new(url)
+        request["Accept"] = 'application/json'
+        request["X-Platform"] = 'ios'
+        request["Content-Type"] = 'application/json'
+        request["Authorization"] = "Bearer #{api_key}"
+
+        request.body = body.to_json
+
+        response = http.request(request)
+        json = JSON.parse(response.read_body)
+
+        UI.success("Attached products #{product_ids} to #{package_id}")
+
+        json
       end
 
       def self.prompt_product_creations(api_key:, project_id:, app_id: , identifiers:)
