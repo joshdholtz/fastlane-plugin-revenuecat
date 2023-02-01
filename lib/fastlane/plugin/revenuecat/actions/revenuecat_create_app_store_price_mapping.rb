@@ -16,6 +16,7 @@ module Fastlane
 
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
+        UI.message("We're in Will's world now 🌎")
         UI.message("Login to App Store Connect (#{params[:apple_username]})")
         Spaceship::ConnectAPI.login(params[:apple_username], use_portal: false, use_tunes: true)
         UI.message("Login successful")
@@ -31,7 +32,7 @@ module Fastlane
           end
         end
 
-        UI.success("Mapping file creatd at: #{path}")
+        UI.success("Mapping file created at: #{path}")
 
 				nil
 			end
@@ -44,12 +45,20 @@ module Fastlane
           .flatten
 
         csv_content = subscriptions.map do |subscription|
+          UI.message("----- Subscription object:")
+          UI.message(subscription.inspect)
+
           intro_offers_by_territory = {}
           subscription.get_introductory_offers.each do |intro_offer|
             intro_offers_by_territory[intro_offer.territory.id] = intro_offer
           end
 
+
           subscription.get_prices.map do |price|
+
+            UI.message("Price object:")
+            UI.message(price.inspect)
+
             duration = ''
             introductory_price_duration = ''
             [
@@ -57,7 +66,7 @@ module Fastlane
               price.territory.id,
               price.subscription_price_point.customer_price,
               price.territory.currency,
-              intro_offers_by_territory[price.territory.id]&.subscription_price_point.customer_price,
+              intro_offers_by_territory[price.territory.id]&.subscription_price_point&.customer_price,
               price.start_date,
               map_duration(subscription.subscription_period),
               map_duration(intro_offers_by_territory[price.territory.id]&.duration)
@@ -66,6 +75,10 @@ module Fastlane
         end.flatten(1)
 
         csv_content
+      end
+
+      def self.threeLetterCountryCodeToTwoLetterCountryCode(threeLetterCountryCode)
+
       end
 
       def self.map_duration(duration)
