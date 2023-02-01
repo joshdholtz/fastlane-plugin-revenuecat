@@ -1,4 +1,5 @@
 require 'fastlane/action'
+require 'iso_country_codes'
 require_relative '../helper/revenuecat_helper'
 
 # product_id,country,price,currency,introductory_price,date,duration,introductory_price_duration
@@ -16,7 +17,6 @@ module Fastlane
 
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
-        UI.message("We're in Will's world now 🌎")
         UI.message("Login to App Store Connect (#{params[:apple_username]})")
         Spaceship::ConnectAPI.login(params[:apple_username], use_portal: false, use_tunes: true)
         UI.message("Login successful")
@@ -45,25 +45,17 @@ module Fastlane
           .flatten
 
         csv_content = subscriptions.map do |subscription|
-          UI.message("----- Subscription object:")
-          UI.message(subscription.inspect)
-
           intro_offers_by_territory = {}
           subscription.get_introductory_offers.each do |intro_offer|
             intro_offers_by_territory[intro_offer.territory.id] = intro_offer
           end
 
-
           subscription.get_prices.map do |price|
-
-            UI.message("Price object:")
-            UI.message(price.inspect)
-
             duration = ''
             introductory_price_duration = ''
             [
               subscription.product_id,
-              price.territory.id,
+              convert_three_to_two_char_country_codes(price.territory.id),
               price.subscription_price_point.customer_price,
               price.territory.currency,
               intro_offers_by_territory[price.territory.id]&.subscription_price_point&.customer_price,
@@ -75,10 +67,6 @@ module Fastlane
         end.flatten(1)
 
         csv_content
-      end
-
-      def self.threeLetterCountryCodeToTwoLetterCountryCode(threeLetterCountryCode)
-
       end
 
       def self.map_duration(duration)
@@ -106,12 +94,30 @@ module Fastlane
         end
       end
 
+      def self.convert_three_to_two_char_country_codes(three_char_country_code)
+
+        # As of Feb 1, 2023, Kosovo is not listed as an ISO standard country. 
+        # The unofficial 2 and 3-digit codes are used by the European Commission and others until 
+        # Kosovo is assigned an ISO code. In the meantime, Apple seems to use "XKS" and "XK".
+        if three_char_country_code == "XKS" || three_char_country_code == "XKX" || three_char_country_code == "XXK"
+          return "XK"
+        end
+        
+        begin
+          code = IsoCountryCodes.find(three_char_country_code)
+          return code.alpha2
+        rescue => error
+          UI.error("Cannot convert unknown country code #{three_char_country_code} from three characters to two characters.")
+          UI.crash!(error)
+        end
+      end
+
       def self.description
         "Create price mapping CSV needed for a RevenueCat import migration"
       end
 
       def self.authors
-        ["Josh Holtz"]
+        ["Josh Holtz", "Will Taylor"]
       end
 
       def self.details
