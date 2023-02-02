@@ -1,5 +1,4 @@
 require 'fastlane/action'
-require 'iso_country_codes'
 require_relative '../helper/revenuecat_helper'
 
 # product_id,country,price,currency,introductory_price,date,duration,introductory_price_duration
@@ -14,6 +13,7 @@ module Fastlane
 				require 'pp'
         require 'spaceship'
         require 'csv'
+        require 'iso_country_codes'
 
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
@@ -47,18 +47,31 @@ module Fastlane
         csv_content = subscriptions.map do |subscription|
           intro_offers_by_territory = {}
           subscription.get_introductory_offers.each do |intro_offer|
+            # UI.message(intro_offer.inspect)
+            # UI.message(intro_offer.territory.id)
             intro_offers_by_territory[intro_offer.territory.id] = intro_offer
           end
 
           subscription.get_prices.map do |price|
             duration = ''
-            introductory_price_duration = ''
+
+            intro_offer_price = ""
+            if intro_offers_by_territory[price.territory.id] != nil
+              intro_offer = intro_offers_by_territory[price.territory.id]
+              if intro_offer.offer_mode == "FREE_TRIAL"
+                # Free trials don't include a price in the ASC API response, so we need to add it manually
+                intro_offer_price = "0.00"
+              end
+            end
+
+            UI.message(price.start_date)
+
             [
               subscription.product_id,
               convert_three_to_two_char_country_codes(price.territory.id),
               price.subscription_price_point.customer_price,
               price.territory.currency,
-              intro_offers_by_territory[price.territory.id]&.subscription_price_point&.customer_price,
+              intro_offer_price,
               price.start_date,
               map_duration(subscription.subscription_period),
               map_duration(intro_offers_by_territory[price.territory.id]&.duration)
