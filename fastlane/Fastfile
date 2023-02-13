@@ -22,6 +22,11 @@ end
 
 lane :price_mapping_app_store do
   revenuecat_create_app_store_price_mapping(
+    # api_key_path: "./fastlane/asc_api_key.json",
+    # apple_app_identifier: "com.example.app",
+
+    # or
+
     # apple_username: "you@example.com",
     # apple_team_name: "Your Team",
     # apple_app_identifier: "com.example.app"

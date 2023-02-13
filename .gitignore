@@ -12,6 +12,9 @@ coverage
 test-results
 
 .env
+fastlane/*.json
 service-credentials.json
+
+app_store_price_mapping.csv
 
 .DS_Store
