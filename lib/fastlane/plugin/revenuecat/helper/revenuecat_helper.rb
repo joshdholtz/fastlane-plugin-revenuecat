@@ -57,7 +57,7 @@ module Fastlane
         ]
       end
 
-      def self.available_options_app_store_connect
+      def self.available_options_apple_id
         [
           FastlaneCore::ConfigItem.new(key: :apple_username,
                                        env_name: "RC_APPLE_USERNAME",
@@ -79,6 +79,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                        end),
+        ]
+      end
+
+      def self.available_options_app_store_connect
+        self.available_options_apple_id + [
           FastlaneCore::ConfigItem.new(key: :apple_app_identifier,
                                        env_name: "RC_APPLE_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
@@ -100,6 +105,19 @@ module Fastlane
                                        optional: true,
                                        sensitive: true,
                                        conflicting_options: [:api_key_path])
+        ]
+      end
+
+      def self.available_options_revenuecat_login
+        [
+          FastlaneCore::ConfigItem.new(key: :revenuecat_email,
+                                       env_name: "RC_EMAIL",
+                                       description: "The RevenueCat account email",
+                                       code_gen_sensitive: true),
+          FastlaneCore::ConfigItem.new(key: :revenuecat_password,
+                                       env_name: "RC_PASSWORD",
+                                       description: "The RevenueCat account password",
+                                       code_gen_sensitive: true)
         ]
       end
 
