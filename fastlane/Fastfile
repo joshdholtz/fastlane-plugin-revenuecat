@@ -32,3 +32,10 @@ lane :price_mapping_app_store do
     # apple_app_identifier: "com.example.app"
   )
 end
+
+lane :onboard do
+  revenuecat_onboard(
+    # apple_username: "you@example.com",
+    # apple_team_name: "Your Team",
+  )
+end
